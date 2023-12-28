@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -22,8 +22,8 @@ class URLMap(db.Model):
 
 @app.route('/')
 def my_index_view():
-    urlmap = URLMap.query.get(1)
-    return urlmap.short
+    # urlmap = URLMap.query.get(1)
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
