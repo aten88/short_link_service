@@ -36,9 +36,17 @@ class URLForm(FlaskForm):
     submit = SubmitField('Создать')
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def my_index_view():
     form = URLForm()
+    if form.validate_on_submit():
+        url = URLMap(
+            original=form.original_link.data,
+            short=form.custom_id.data
+        )
+        db.session.add(url)
+        db.session.commit()
+        return render_template('yacut.html', form=form)
     return render_template('yacut.html', form=form)
 
 

@@ -19,7 +19,7 @@
                   {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
                   <p>
                     {% if form.original_link.errors %}
-                      {% for error in from.original_link.errors %}
+                      {% for error in form.original_link.errors %}
                         <span style="color:red">{{ error }}</span>
                       {% endfor %}
                     {% endif %}
