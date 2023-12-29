@@ -23,7 +23,7 @@ class URLMap(db.Model):
 @app.route('/')
 def my_index_view():
     # urlmap = URLMap.query.get(1)
-    return render_template('index.html')
+    return render_template('yacut.html')
 
 
 if __name__ == '__main__':
