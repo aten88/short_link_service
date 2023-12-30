@@ -49,13 +49,13 @@ def my_index_view():
             flash('Такой вариант короткой ссылки уже существует в БД')
             return render_template('yacut.html', form=form)
         else:
-            flash(f'Ваша новая ссылка готова: {short}')
-        url = URLMap(
-            original=form.original_link.data,
-            short=form.custom_id.data
-        )
-        db.session.add(url)
-        db.session.commit()
+            flash(f'Ваша новая ссылка готова: <a href="{short}">{short}</a>')
+            url = URLMap(
+                original=form.original_link.data,
+                short=form.custom_id.data
+            )
+            db.session.add(url)
+            db.session.commit()
     return render_template('yacut.html', form=form)
 
 
