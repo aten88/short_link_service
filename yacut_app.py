@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
@@ -37,7 +37,7 @@ class URLForm(FlaskForm):
 
 
 @app.route('/', methods=['GET', 'POST'])
-def my_index_view():
+def get_unique_short_id():
     form = URLForm()
     if form.validate_on_submit():
         original = form.original_link.data
@@ -49,7 +49,7 @@ def my_index_view():
             flash('Такой вариант короткой ссылки уже существует в БД')
             return render_template('yacut.html', form=form)
         else:
-            flash(f'Ваша новая ссылка готова: <a href="{short}">{short}</a>')
+            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{short}">{short}</a>')
             url = URLMap(
                 original=form.original_link.data,
                 short=form.custom_id.data
@@ -57,6 +57,12 @@ def my_index_view():
             db.session.add(url)
             db.session.commit()
     return render_template('yacut.html', form=form)
+
+
+@app.route('/redirect/<short>')
+def redirect_short_url(short):
+    link = URLMap.query.filter_by(short=short).first_or_404()
+    return redirect(link.original)
 
 
 if __name__ == '__main__':
