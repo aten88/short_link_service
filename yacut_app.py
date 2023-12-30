@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
@@ -20,7 +20,7 @@ class URLMap(db.Model):
     """ Модель URL- адреса. """
     id = db.Column(db.Integer, primary_key=True)
     original = db.Column(db.Text, unique=True, nullable=False)
-    short = db.Column(db.String(16))
+    short = db.Column(db.String(16), unique=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
@@ -40,13 +40,22 @@ class URLForm(FlaskForm):
 def my_index_view():
     form = URLForm()
     if form.validate_on_submit():
+        original = form.original_link.data
+        short = form.custom_id.data
+        if URLMap.query.filter_by(original=original).first() is not None:
+            flash('Такой вариант полной ссылки уже существует в БД')
+            return render_template('yacut.html', form=form)
+        elif URLMap.query.filter_by(short=short).first() is not None:
+            flash('Такой вариант короткой ссылки уже существует в БД')
+            return render_template('yacut.html', form=form)
+        else:
+            flash(f'Ваша новая ссылка готова: {short}')
         url = URLMap(
             original=form.original_link.data,
             short=form.custom_id.data
         )
         db.session.add(url)
         db.session.commit()
-        return render_template('yacut.html', form=form)
     return render_template('yacut.html', form=form)
 
 

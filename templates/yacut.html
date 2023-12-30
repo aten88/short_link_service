@@ -50,7 +50,13 @@
           </div>
           <div class="col-sm">
             <p class="text-center">
-            <h5 class="text-center">Пример информационного сообщения</h5>
+              {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+                    <h5 class="text-center">{{ message }}</h5>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
             </p>
           </div>
           <div class="col-sm">
