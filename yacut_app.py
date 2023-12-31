@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 
 from flask import Flask, render_template, flash, redirect
@@ -17,7 +18,7 @@ db = SQLAlchemy(app)
 
 
 class URLMap(db.Model):
-    """ Модель URL- адреса. """
+    """ Модель URL-адресов. """
     id = db.Column(db.Integer, primary_key=True)
     original = db.Column(db.Text, unique=True, nullable=False)
     short = db.Column(db.String(16), unique=True, nullable=False)
@@ -25,42 +26,62 @@ class URLMap(db.Model):
 
 
 class URLForm(FlaskForm):
+    """ Форма URL-адресов. """
     original_link = TextAreaField(
         'Укажите полную ссылку',
         validators=[DataRequired(message='Обязательное поле')]
     )
     custom_id = StringField(
         'Укажите короткую ссылку',
-        validators=[Length(1, 16)]
+        validators=[Length(0, 16)]
     )
     submit = SubmitField('Создать')
 
 
+def create_article(original, short):
+    """ Метод проверки и создания ссылки. """
+    if URLMap.query.filter_by(original=original).first() is not None:
+        flash('Предложенный вариант полной ссылки уже существует.')
+        return redirect('/')
+    elif URLMap.query.filter_by(short=short).first() is not None:
+        flash('Предложенный вариант короткой ссылки уже существует.')
+        return redirect('/')
+    else:
+        url = URLMap(
+            original=original,
+            short=short
+        )
+        db.session.add(url)
+        db.session.commit()
+        return flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
+
+
+def create_random_url(original_link):
+    """ Метод создания короткой ссылки. """
+    valid_chars = [char for char in list(original_link) if char.isalnum()]
+    short_link_chars = random.choices(valid_chars, k=6)
+    short_link = ''.join(short_link_chars)
+    return short_link
+
+
 @app.route('/', methods=['GET', 'POST'])
 def get_unique_short_id():
+    """ Метод получения короткой ссылки. """
     form = URLForm()
     if form.validate_on_submit():
         original = form.original_link.data
-        short = form.custom_id.data
-        if URLMap.query.filter_by(original=original).first() is not None:
-            flash('Предложенный вариант полной ссылки уже существует.')
-            return redirect('/')
-        elif URLMap.query.filter_by(short=short).first() is not None:
-            flash('Предложенный вариант короткой ссылки уже существует.')
-            return redirect('/')
-        else:
-            url = URLMap(
-                original=form.original_link.data,
-                short=form.custom_id.data
-            )
-            db.session.add(url)
-            db.session.commit()
-            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
+        short_form = form.custom_id.data
+        if not short_form:
+            short_form = create_random_url(original)
+        result = create_article(original, short_form)
+        if result:
+            return result
     return render_template('yacut.html', form=form)
 
 
 @app.route('/redirect/<short>')
 def redirect_short_url(short):
+    """ Метод перехода по короткой ссылке. """
     link = URLMap.query.filter_by(short=short).first_or_404()
     return redirect(link.original)
 
