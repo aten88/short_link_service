@@ -20,7 +20,7 @@ class URLMap(db.Model):
     """ Модель URL- адреса. """
     id = db.Column(db.Integer, primary_key=True)
     original = db.Column(db.Text, unique=True, nullable=False)
-    short = db.Column(db.String(16), unique=True)
+    short = db.Column(db.String(16), unique=True, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
@@ -31,7 +31,7 @@ class URLForm(FlaskForm):
     )
     custom_id = StringField(
         'Укажите короткую ссылку',
-        validators=[Length(1, 6)]
+        validators=[Length(1, 16)]
     )
     submit = SubmitField('Создать')
 
@@ -43,19 +43,19 @@ def get_unique_short_id():
         original = form.original_link.data
         short = form.custom_id.data
         if URLMap.query.filter_by(original=original).first() is not None:
-            flash('Такой вариант полной ссылки уже существует в БД')
-            return render_template('yacut.html', form=form)
+            flash('Предложенный вариант полной ссылки уже существует.')
+            return redirect('/')
         elif URLMap.query.filter_by(short=short).first() is not None:
-            flash('Такой вариант короткой ссылки уже существует в БД')
-            return render_template('yacut.html', form=form)
+            flash('Предложенный вариант короткой ссылки уже существует.')
+            return redirect('/')
         else:
-            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{short}">{short}</a>')
             url = URLMap(
                 original=form.original_link.data,
                 short=form.custom_id.data
             )
             db.session.add(url)
             db.session.commit()
+            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
     return render_template('yacut.html', form=form)
 
 
