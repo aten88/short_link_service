@@ -38,24 +38,6 @@ class URLForm(FlaskForm):
     submit = SubmitField('Создать')
 
 
-def create_article(original, short):
-    """ Метод проверки и создания ссылки. """
-    if URLMap.query.filter_by(original=original).first() is not None:
-        flash('Предложенный вариант полной ссылки уже существует.')
-        return redirect('/')
-    elif URLMap.query.filter_by(short=short).first() is not None:
-        flash('Предложенный вариант короткой ссылки уже существует.')
-        return redirect('/')
-    else:
-        url = URLMap(
-            original=original,
-            short=short
-        )
-        db.session.add(url)
-        db.session.commit()
-        return flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
-
-
 def create_random_url(original_link):
     """ Метод создания короткой ссылки. """
     valid_chars = [char for char in list(original_link) if char.isalnum()]
@@ -73,9 +55,20 @@ def get_unique_short_id():
         short_form = form.custom_id.data
         if not short_form:
             short_form = create_random_url(original)
-        result = create_article(original, short_form)
-        if result:
-            return result
+        if URLMap.query.filter_by(original=original).first() is not None:
+            flash('Предложенный вариант полной ссылки уже существует.')
+            redirect('/')
+        elif URLMap.query.filter_by(short=short_form).first() is not None:
+            flash('Предложенный вариант короткой ссылки уже существует.')
+            redirect('/')
+        else:
+            url = URLMap(
+                original=original,
+                short=short_form
+            )
+            db.session.add(url)
+            db.session.commit()
+            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
     return render_template('yacut.html', form=form)
 
 
