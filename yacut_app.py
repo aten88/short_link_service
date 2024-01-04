@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from flask_migrate import Migrate
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length
 
@@ -15,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'H4#dl2Fm7'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class URLMap(db.Model):
