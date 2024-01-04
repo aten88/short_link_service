@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}500. INTERNAL SERVER ERROR!{% endblock %}
+{% block content %}
+<main>
+  <section class="container my-5">
+    <div class="row">
+      <div class="col-12 col-lg-7 my-5">
+        <h1 class="mb-5">Сервер не отвечает!</h1>
+        <p>
+          Возможно, на сервере произошёл сбой или проводятся технические работы. 
+          Попробуйте обновить страницу через некоторое время.
+        </p>
+      </div>
+      <div class="col-12 col-lg-5">
+        <img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/500.jpg') }}" alt="" />
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
