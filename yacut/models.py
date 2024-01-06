@@ -13,10 +13,8 @@ class URLMap(db.Model):
     def url_to_dict(url_map):
         """ Метод преобразования данных в словарь. """
         return dict(
-            id=url_map.id,
-            original=url_map.original,
-            short=url_map.short,
-            timestamp=url_map.timestamp
+            url=url_map.original,
+            short_link=f'http://localhost/{url_map.short}'
         )
 
     def from_dict(self, data):

@@ -14,7 +14,7 @@ def get_unique_short_id():
         original = form.original_link.data
         short_form = form.custom_id.data
         if not short_form:
-            short_form = create_random_url(original)
+            short_form = create_random_url()
         if URLMap.query.filter_by(original=original).first() is not None:
             flash('Предложенный вариант полной ссылки уже существует.')
             redirect('/')
