@@ -12,8 +12,6 @@ def create_id():
     data = request.get_json()
     original_url = data.get('url')
     short_url = data.get('custom_id')
-    if not original_url:
-        return jsonify({'message': 'Указано недопустимое имя для короткой ссылки'}), 400
     if short_url is None:
         short_url = create_random_url()
     if len(short_url) > 16:
@@ -29,7 +27,7 @@ def create_id():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return jsonify({'error': 'Ошибка целостности'}), 500
+        return jsonify({'error': 'Отсутствует тело запроса'}), 400
     return jsonify(url_map.url_to_dict()), 201
 
 
