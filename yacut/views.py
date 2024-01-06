@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, request
 
 from . import app, db
 from .models import URLMap
@@ -15,11 +15,11 @@ def get_unique_short_id():
         short_form = form.custom_id.data
         if not short_form:
             short_form = create_random_url()
-        if URLMap.query.filter_by(original=original).first() is not None:
-            flash('Предложенный вариант полной ссылки уже существует.')
+        if URLMap.query.filter_by(short=short_form).first() is not None:
+            flash('Предложенный вариант короткой ссылки уже существует.')
             redirect('/')
-        elif URLMap.query.filter_by(short=short_form).first() is not None:
-            flash('"Предложенный вариант короткой ссылки уже существует."')
+        elif URLMap.query.filter_by(original=original).first() is not None:
+            flash('Предложенный вариант полной ссылки уже существует.')
             redirect('/')
         else:
             url = URLMap(
@@ -28,7 +28,7 @@ def get_unique_short_id():
             )
             db.session.add(url)
             db.session.commit()
-            flash(f'Ваша новая ссылка готова: <a href="/{url.short}">http://127.0.0.1:5000/{url.short}</a>')
+            flash(f'Ваша новая ссылка готова: <a href="{request.host_url}{url.short}">{request.host_url}{url.short}</a>')
     return render_template('yacut.html', form=form)
 
 
