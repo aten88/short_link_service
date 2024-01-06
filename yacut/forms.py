@@ -6,11 +6,11 @@ from wtforms.validators import DataRequired, Length
 class URLForm(FlaskForm):
     """ Форма URL-адресов. """
     original_link = TextAreaField(
-        'Укажите полную ссылку',
+        'Длинная ссылка',
         validators=[DataRequired(message='Обязательное поле')]
     )
     custom_id = StringField(
-        'Укажите короткую ссылку',
+        'Ваш вариант короткой ссылки',
         validators=[Length(0, 16)]
     )
     submit = SubmitField('Создать')

@@ -19,7 +19,7 @@ def get_unique_short_id():
             flash('Предложенный вариант полной ссылки уже существует.')
             redirect('/')
         elif URLMap.query.filter_by(short=short_form).first() is not None:
-            flash('Предложенный вариант короткой ссылки уже существует.')
+            flash('"Предложенный вариант короткой ссылки уже существует."')
             redirect('/')
         else:
             url = URLMap(
@@ -28,11 +28,11 @@ def get_unique_short_id():
             )
             db.session.add(url)
             db.session.commit()
-            flash(f'Ваша новая короткая ссылка: <a href="/redirect/{url.short}">{url.short}</a>')
+            flash(f'Ваша новая ссылка готова: <a href="/{url.short}">http://127.0.0.1:5000/{url.short}</a>')
     return render_template('yacut.html', form=form)
 
 
-@app.route('/redirect/<short>')
+@app.route('/<short>')
 def redirect_short_url(short):
     """ Метод перехода по короткой ссылке. """
     link = URLMap.query.filter_by(short=short).first_or_404()
