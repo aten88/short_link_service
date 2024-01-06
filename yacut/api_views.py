@@ -14,9 +14,6 @@ def create_id():
     short_url = data.get('custom_id')
     if not original_url:
         return jsonify({'message': 'Указано недопустимое имя для короткой ссылки'}), 400
-    existing_url_map = URLMap.query.filter_by(original=original_url).first()
-    if existing_url_map:
-        return jsonify({'message': 'Предложенный вариант полной ссылки уже существует.'}), 400
     if short_url is None:
         short_url = create_random_url()
     if len(short_url) > 16:
@@ -24,6 +21,8 @@ def create_id():
     existing_short_url = URLMap.query.filter_by(short=short_url).first()
     if existing_short_url:
         return jsonify({'message': 'Предложенный вариант короткой ссылки уже существует.'}), 400
+    if not (short_url.isalnum() and short_url.isascii()):
+        return jsonify({'message': 'Указано недопустимое имя для короткой ссылки'}), 400
     url_map = URLMap(original=original_url, short=short_url)
     try:
         db.session.add(url_map)
