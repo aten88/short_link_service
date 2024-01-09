@@ -17,6 +17,7 @@ def create_random_url():
 
 
 class URLService:
+    """ Класс с универсальными методами бизнес-логики. """
     def create_original_url(data):
         """ Метод создания полной ссылки. """
         original_url = data.get('url')
@@ -43,6 +44,7 @@ class URLService:
         return errors
 
     def create_record(object):
+        """ Метод создания записи в БД. """
         errors = []
         try:
             db.session.add(object)
