@@ -1,12 +1,10 @@
 from http import HTTPStatus
 
 from flask import jsonify, request
-from sqlalchemy.exc import SQLAlchemyError
 
-from . import app, db
+from . import app
 from .models import URLMap
-from .utils import create_random_url
-from .constants import MAX_LENGHT_SHORT_A
+from .utils import URLService
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -15,27 +13,15 @@ def create_id():
     data = request.get_json()
     if not data:
         return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
-    original_url = data.get('url')
-    short_url = data.get('custom_id')
-    if short_url is None or not short_url:
-        short_url = create_random_url()
-    if len(short_url) > MAX_LENGHT_SHORT_A:
-        return jsonify({'message': 'Указано недопустимое имя для короткой ссылки'}), HTTPStatus.BAD_REQUEST
-    existing_short_url = URLMap.query.filter_by(short=short_url).first()
-    if existing_short_url:
-        return jsonify({'message': 'Предложенный вариант короткой ссылки уже существует.'}), HTTPStatus.BAD_REQUEST
-    existing_url = URLMap.query.filter_by(original=original_url).first()
-    if existing_url:
-        return jsonify({'message': 'Предложенный вариант полной ссылки уже существует.'}), HTTPStatus.BAD_REQUEST
-    if not (short_url.isalnum() and short_url.isascii()):
-        return jsonify({'message': 'Указано недопустимое имя для короткой ссылки'}), HTTPStatus.BAD_REQUEST
+    original_url = URLService.create_original_url(data)
+    short_url = URLService.create_short_url(data)
+    if URLService.check_for_validate(original_url, short_url):
+        for errors in URLService.check_for_validate(original_url, short_url):
+            return jsonify({'message': errors}), HTTPStatus.BAD_REQUEST
     url_map = URLMap(original=original_url, short=short_url)
-    try:
-        db.session.add(url_map)
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        return jsonify({'message': '\"url\" является обязательным полем!'}), HTTPStatus.BAD_REQUEST
+    if URLService.create_record(url_map):
+        for error in URLService.create_record(url_map):
+            return jsonify({'message': error}), HTTPStatus.BAD_REQUEST
     return jsonify(url_map.url_to_dict()), HTTPStatus.CREATED
 
 
