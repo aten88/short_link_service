@@ -19,6 +19,8 @@ class URLService:
     def validate_url(original_url, short_url=None):
         """ Метод валидации ссылок. """
         errors = []
+        if not original_url:
+            return {'\"url\" является обязательным полем!'}
         if len(short_url) > MAX_LENGHT_SHORT_A:
             errors.append('Указано недопустимое имя для короткой ссылки')
         if URLMap.query.filter_by(short=short_url).first():
@@ -36,4 +38,3 @@ class URLService:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            return {'\"url\" является обязательным полем!'}
