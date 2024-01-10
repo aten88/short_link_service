@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, request
 from . import app, db
 from .models import URLMap
 from .forms import URLForm
-from .utils import URLService
+from .services import URLService
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -12,7 +12,7 @@ def get_unique_short_id():
     form = URLForm()
     if form.validate_on_submit():
         data = {'url': form.original_link.data, 'custom_id': form.custom_id.data}
-        original_url = URLService.create_original_url(data)
+        original_url = form.original_link.data
         short_url = URLService.create_short_url(data)
         if URLService.check_for_validate(original_url, short_url):
             for error in URLService.check_for_validate(original_url, short_url):

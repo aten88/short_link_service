@@ -4,7 +4,7 @@ from flask import jsonify, request
 
 from . import app
 from .models import URLMap
-from .utils import URLService
+from .services import URLService
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -13,7 +13,7 @@ def create_id():
     data = request.get_json()
     if not data:
         return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
-    original_url = URLService.create_original_url(data)
+    original_url = data.get('url')
     short_url = URLService.create_short_url(data)
     if URLService.check_for_validate(original_url, short_url):
         for errors in URLService.check_for_validate(original_url, short_url):

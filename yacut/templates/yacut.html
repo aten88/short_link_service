@@ -26,11 +26,9 @@
                 <div>
                   {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text) }}
                   <p>
-                    {% if form.custom_id.errors %}
                       {% for error in form.custom_id.errors %}
                         <span style="color:red">{{ error }}</span>
                       {% endfor %}
-                    {% endif %}
                   </p>
                 </div>
                 {{ form.submit(class="btn btn-primary") }}
@@ -49,11 +47,9 @@
           <div class="col-sm">
             <p class="text-center">
               {% with messages = get_flashed_messages() %}
-                {% if messages %}
                   {% for message in messages %}
                     <h5 class="text-center">{{ message|safe }}</h5>
                   {% endfor %}
-                {% endif %}
               {% endwith %}
             </p>
           </div>
