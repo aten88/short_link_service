@@ -11,13 +11,12 @@ def get_unique_short_id():
     """ Метод получения короткой ссылки. """
     form = URLForm()
     if form.validate_on_submit():
-        original_url = form.original_link.data
         short_url = URLService.create_short_url({'custom_id': form.custom_id.data})
-        if URLService.validate_url(original_url, short_url):
-            for error in URLService.validate_url(original_url, short_url):
+        if URLService.validate_url(form.original_link.data, short_url):
+            for error in URLService.validate_url(form.original_link.data, short_url):
                 flash(error)
             return redirect('/')
-        url = URLMap(original=original_url, short=short_url)
+        url = URLMap(original=form.original_link.data, short=short_url)
         if URLService.create_record(url):
             for error in URLService.create_record(url):
                 flash(error)
@@ -29,5 +28,4 @@ def get_unique_short_id():
 @app.route('/<short>')
 def redirect_short_url(short):
     """ Метод перехода по короткой ссылке. """
-    link = URLMap.query.filter_by(short=short).first_or_404()
-    return redirect(link.original)
+    return redirect(URLMap.query.filter_by(short=short).first_or_404().original)

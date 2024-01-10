@@ -10,15 +10,13 @@ from .services import URLService
 @app.route('/api/id/', methods=['POST'])
 def create_id():
     """ Метод создания записи через API. """
-    data = request.get_json()
-    if not data:
+    if not request.get_json():
         return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
-    original_url = data.get('url')
-    short_url = URLService.create_short_url(data)
-    if URLService.validate_url(original_url, short_url):
-        for errors in URLService.validate_url(original_url, short_url):
+    short_url = URLService.create_short_url(request.get_json())
+    if URLService.validate_url(request.get_json().get('url'), short_url):
+        for errors in URLService.validate_url(request.get_json().get('url'), short_url):
             return jsonify({'message': errors}), HTTPStatus.BAD_REQUEST
-    url_map = URLMap(original=original_url, short=short_url)
+    url_map = URLMap(original=request.get_json().get('url'), short=short_url)
     if URLService.create_record(url_map):
         for error in URLService.create_record(url_map):
             return jsonify({'message': error}), HTTPStatus.BAD_REQUEST
@@ -28,7 +26,6 @@ def create_id():
 @app.route('/api/id/<short_id>/', methods=['GET'])
 def get_url(short_id):
     """ Метод получения ссылки по идентификатору. """
-    url_map = URLMap.query.filter_by(short=short_id).first()
-    if url_map is None:
+    if URLMap.query.filter_by(short=short_id).first() is None:
         return jsonify({'message': 'Указанный id не найден'}), HTTPStatus.NOT_FOUND
-    return jsonify({'url': url_map.original}), HTTPStatus.OK
+    return jsonify({'url': URLMap.query.filter_by(short=short_id).first().original}), HTTPStatus.OK
