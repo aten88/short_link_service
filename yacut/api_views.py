@@ -15,8 +15,8 @@ def create_id():
         return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
     original_url = data.get('url')
     short_url = URLService.create_short_url(data)
-    if URLService.check_for_validate(original_url, short_url):
-        for errors in URLService.check_for_validate(original_url, short_url):
+    if URLService.validate_url(original_url, short_url):
+        for errors in URLService.validate_url(original_url, short_url):
             return jsonify({'message': errors}), HTTPStatus.BAD_REQUEST
     url_map = URLMap(original=original_url, short=short_url)
     if URLService.create_record(url_map):

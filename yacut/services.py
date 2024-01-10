@@ -16,7 +16,7 @@ class URLService:
             short_url = create_random_url()
         return short_url
 
-    def check_for_validate(original_url, short_url=None):
+    def validate_url(original_url, short_url=None):
         """ Метод валидации ссылок. """
         errors = []
         if len(short_url) > MAX_LENGHT_SHORT_A:
