@@ -31,11 +31,9 @@ class URLService:
 
     def create_record(object):
         """ Метод создания записи в БД. """
-        errors = []
         try:
             db.session.add(object)
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            errors.append('\"url\" является обязательным полем!')
-            return errors
+            return {'\"url\" является обязательным полем!'}
