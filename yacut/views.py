@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, request
+from flask import render_template, flash, redirect
 
 from . import app
 from .models import URLMap
@@ -11,17 +11,11 @@ def get_unique_short_id():
     """ Метод получения короткой ссылки. """
     form = URLForm()
     if form.validate_on_submit():
-        short_url = URLService.create_short_url({'custom_id': form.custom_id.data})
-        if URLService.validate_url(form.original_link.data, short_url):
-            for error in URLService.validate_url(form.original_link.data, short_url):
-                flash(error)
+        result = URLService.validate_create_url({'url': form.original_link.data, 'custom_id': form.custom_id.data})
+        if 'errors' in result:
+            flash(result['errors'])
             return redirect('/')
-        url = URLMap(original=form.original_link.data, short=short_url)
-        if URLService.create_record(url):
-            for error in URLService.create_record(url):
-                flash(error)
-            return redirect('/')
-        flash(f'Ваша новая ссылка готова: <a href="{request.host_url}{url.short}">{request.host_url}{url.short}</a>')
+        flash(f'Ваша новая ссылка готова: <a href="{result["data"]["short_link"]}">{result["data"]["short_link"]}</a>')
     return render_template('yacut.html', form=form)
 
 

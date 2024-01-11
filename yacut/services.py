@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+from http import HTTPStatus
 
 from . import db
 from .models import URLMap
@@ -9,32 +9,30 @@ from .utils import create_random_url
 class URLService:
     """ Класс с универсальными методами бизнес-логики. """
 
-    def create_short_url(data):
+    def validate_create_url(data):
         """ Метод создания короткой ссылки. """
+        errors = []
+        original_url = data.get('url')
         short_url = data.get('custom_id')
+        if not original_url:
+            errors.append('\"url\" является обязательным полем!')
         if not short_url:
             short_url = create_random_url()
-        return short_url
-
-    def validate_url(original_url, short_url=None):
-        """ Метод валидации ссылок. """
-        errors = []
-        if not original_url:
-            return {'\"url\" является обязательным полем!'}
+        if not (short_url.isalnum() and short_url.isascii()):
+            errors.append('Указано недопустимое имя для короткой ссылки')
         if len(short_url) > MAX_LENGHT_SHORT_A:
             errors.append('Указано недопустимое имя для короткой ссылки')
         if URLMap.query.filter_by(short=short_url).first():
             errors.append('Предложенный вариант короткой ссылки уже существует.')
-        if not (short_url.isalnum() and short_url.isascii()):
-            errors.append('Указано недопустимое имя для короткой ссылки')
-        if URLMap.query.filter_by(original=original_url).first():
-            errors.append('Предложенный вариант полной ссылки уже существует.')
-        return errors
+        if errors:
+            return {'errors': errors[0], 'status': HTTPStatus.BAD_REQUEST}
 
-    def create_record(object):
-        """ Метод создания записи в БД. """
-        try:
-            db.session.add(object)
+        existing_url_map = URLMap.query.filter_by(original=original_url).first()
+        if existing_url_map:
+            existing_url_map.short = create_random_url()
             db.session.commit()
-        except SQLAlchemyError:
-            db.session.rollback()
+            return {'data': existing_url_map.url_to_dict(), 'status': HTTPStatus.CREATED}
+        url_map = URLMap(original=original_url, short=short_url)
+        db.session.add(url_map)
+        db.session.commit()
+        return {'data': url_map.url_to_dict(), 'status': HTTPStatus.CREATED}
