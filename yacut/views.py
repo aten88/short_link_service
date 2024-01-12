@@ -11,11 +11,12 @@ def get_unique_short_id():
     """ Метод получения короткой ссылки. """
     form = URLForm()
     if form.validate_on_submit():
-        result = URLService.create_url({'url': form.original_link.data, 'custom_id': form.custom_id.data})
-        if 'errors' in result:
-            flash(result['errors'])
+        try:
+            result = URLService.create_url({'url': form.original_link.data, 'custom_id': form.custom_id.data})
+        except ValueError as e:
+            flash(str(e))
             return redirect('/')
-        flash(f'Ваша новая ссылка готова: <a href="{result["data"]["short_link"]}">{result["data"]["short_link"]}</a>')
+        flash(f'Ваша новая ссылка готова: <a href="{result["short_link"]}">{result["short_link"]}</a>')
     return render_template('yacut.html', form=form)
 
 

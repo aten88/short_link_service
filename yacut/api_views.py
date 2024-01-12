@@ -10,12 +10,13 @@ from .services import URLService
 @app.route('/api/id/', methods=['POST'])
 def create_id():
     """ Метод создания записи через API. """
-    if not request.get_json():
-        return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
-    result = URLService.create_url(request.get_json())
-    if 'errors' in result:
-        return jsonify({'message': result['errors']}), HTTPStatus.BAD_REQUEST
-    return jsonify(result['data']), HTTPStatus.CREATED
+    try:
+        if not request.get_json():
+            raise ValueError('Отсутствует тело запроса')
+        result = URLService.create_url(request.get_json())
+    except ValueError as e:
+        return jsonify({'message': str(e)}), HTTPStatus.BAD_REQUEST
+    return jsonify(result), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])

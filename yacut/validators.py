@@ -3,7 +3,7 @@ from .constants import MAX_LENGHT_SHORT_A
 
 
 def validate_url(long_url, short_url):
-    """   Метод валидации URLS. """
+    """ Метод валидации URLS. """
     if not long_url:
         return '\"url\" является обязательным полем!'
     if not (short_url.isalnum() and short_url.isascii()):
