@@ -5,6 +5,7 @@ from flask import jsonify, request
 from . import app
 from .models import URLMap
 from .services import URLService
+from .error_handlers import InvalidURLException
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -12,9 +13,9 @@ def create_id():
     """ Метод создания записи через API. """
     try:
         if not request.get_json():
-            raise ValueError('Отсутствует тело запроса')
+            raise InvalidURLException('Отсутствует тело запроса')
         result = URLService.create_url(request.get_json())
-    except ValueError as e:
+    except InvalidURLException as e:
         return jsonify({'message': str(e)}), HTTPStatus.BAD_REQUEST
     return jsonify(result), HTTPStatus.CREATED
 

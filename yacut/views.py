@@ -4,6 +4,7 @@ from . import app
 from .models import URLMap
 from .forms import URLForm
 from .services import URLService
+from .error_handlers import InvalidURLException
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -13,7 +14,7 @@ def get_unique_short_id():
     if form.validate_on_submit():
         try:
             result = URLService.create_url({'url': form.original_link.data, 'custom_id': form.custom_id.data})
-        except ValueError as e:
+        except InvalidURLException as e:
             flash(str(e))
             return redirect('/')
         flash(f'Ваша новая ссылка готова: <a href="{result["short_link"]}">{result["short_link"]}</a>')
