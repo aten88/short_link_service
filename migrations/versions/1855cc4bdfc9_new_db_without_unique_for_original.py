@@ -1,8 +1,8 @@
-"""create new table
+"""new db without unique for original
 
-Revision ID: e6ef45bc2461
+Revision ID: 1855cc4bdfc9
 Revises: 
-Create Date: 2024-01-07 16:02:05.563810
+Create Date: 2024-01-12 11:24:07.634670
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e6ef45bc2461'
+revision = '1855cc4bdfc9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,6 @@ def upgrade():
     sa.Column('short', sa.String(length=16), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('original'),
     sa.UniqueConstraint('short')
     )
     op.create_index(op.f('ix_url_map_timestamp'), 'url_map', ['timestamp'], unique=False)

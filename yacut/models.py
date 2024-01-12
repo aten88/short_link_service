@@ -9,7 +9,7 @@ from .constants import MAX_LENGHT_SHORT_A
 class URLMap(db.Model):
     """ Модель URL-адресов. """
     id = db.Column(db.Integer, primary_key=True)
-    original = db.Column(db.Text, unique=True, nullable=False)
+    original = db.Column(db.Text, nullable=False)
     short = db.Column(db.String(MAX_LENGHT_SHORT_A), unique=True, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 

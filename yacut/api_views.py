@@ -12,10 +12,10 @@ def create_id():
     """ Метод создания записи через API. """
     if not request.get_json():
         return jsonify({'message': 'Отсутствует тело запроса'}), HTTPStatus.BAD_REQUEST
-    result = URLService.validate_create_url(request.get_json())
+    result = URLService.create_url(request.get_json())
     if 'errors' in result:
-        return jsonify({'message': result['errors']}), result['status']
-    return jsonify(result['data']), result['status']
+        return jsonify({'message': result['errors']}), HTTPStatus.BAD_REQUEST
+    return jsonify(result['data']), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])
