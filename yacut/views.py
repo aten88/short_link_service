@@ -13,7 +13,7 @@ def get_unique_short_id():
     form = URLForm()
     if form.validate_on_submit():
         try:
-            result = URLService.create_url({'url': form.original_link.data, 'custom_id': form.custom_id.data})
+            result = URLService.create_url(form.original_link.data, form.custom_id.data)
         except InvalidURLException as e:
             flash(str(e))
             return redirect('/')

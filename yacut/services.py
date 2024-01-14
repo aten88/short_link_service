@@ -1,15 +1,22 @@
 from . import db
 from .models import URLMap
 from .validators import validate_url
+from .utils import create_random_url
+from .constants import MAX_ATTEMPTS
+from .error_handlers import InvalidURLException
 
 
 class URLService:
     """ Класс с универсальными методами бизнес-логики. """
 
-    def create_url(response_json_data):
+    def create_url(original_link, short_link=None):
         """ Метод создания короткой ссылки. """
-        validated_long_url, validated_short_url = validate_url(response_json_data.get('url'), response_json_data.get('custom_id'))
-        url_map = URLMap(original=validated_long_url, short=validated_short_url)
-        db.session.add(url_map)
-        db.session.commit()
-        return url_map.url_to_dict()
+        if not short_link:
+            short_link = create_random_url(MAX_ATTEMPTS)
+        if not validate_url(original_link, short_link):
+            url_map = URLMap(original=original_link, short=short_link)
+            db.session.add(url_map)
+            db.session.commit()
+            return url_map.url_to_dict()
+        else:
+            raise InvalidURLException('Уникальная короткая ссылка не была сгенерирована.')

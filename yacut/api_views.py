@@ -14,7 +14,7 @@ def create_id():
     try:
         if not request.get_json():
             raise InvalidURLException('Отсутствует тело запроса')
-        result = URLService.create_url(request.get_json())
+        result = URLService.create_url(request.get_json().get('url'), request.get_json().get('custom_id'))
     except InvalidURLException as e:
         return jsonify({'message': str(e)}), HTTPStatus.BAD_REQUEST
     return jsonify(result), HTTPStatus.CREATED
