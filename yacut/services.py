@@ -3,7 +3,6 @@ from .models import URLMap
 from .validators import validate_url
 from .utils import create_random_url
 from .constants import MAX_ATTEMPTS
-from .error_handlers import InvalidURLException
 
 
 class URLService:
@@ -13,10 +12,10 @@ class URLService:
         """ Метод создания короткой ссылки. """
         if not short_link:
             short_link = create_random_url(MAX_ATTEMPTS)
-        if not validate_url(original_link, short_link):
-            url_map = URLMap(original=original_link, short=short_link)
-            db.session.add(url_map)
-            db.session.commit()
-            return url_map.url_to_dict()
+            validate_url(original_link, short_link, is_generated=True)
         else:
-            raise InvalidURLException('Уникальная короткая ссылка не была сгенерирована.')
+            validate_url(original_link, short_link)
+        url_map = URLMap(original=original_link, short=short_link)
+        db.session.add(url_map)
+        db.session.commit()
+        return url_map.url_to_dict()

@@ -23,6 +23,7 @@ def create_id():
 @app.route('/api/id/<short_id>/', methods=['GET'])
 def get_url(short_id):
     """ Метод получения ссылки по идентификатору. """
-    if URLMap.query.filter_by(short=short_id).first() is None:
+    short_url_object = URLMap.query.filter_by(short=short_id).first()
+    if short_url_object is None:
         return jsonify({'message': 'Указанный id не найден'}), HTTPStatus.NOT_FOUND
-    return jsonify({'url': URLMap.query.filter_by(short=short_id).first().original}), HTTPStatus.OK
+    return jsonify({'url': short_url_object.original}), HTTPStatus.OK
