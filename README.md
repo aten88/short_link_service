@@ -1,4 +1,4 @@
-# YaCut - сервис укорачивания ссылок с web-страницей и API.
+# short link service - сервис укорачивания ссылок с web-страницей и API.
 Его задача — укорачивать и ассоциировать длинную пользовательскую ссылку с короткой, которую предлагает сам пользователь или генерирует сервис самостоятельно.
 
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=ffffff&color=043A6B)](https://www.python.org/)
